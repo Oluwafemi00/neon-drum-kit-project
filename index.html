@@ -1,32 +1,52 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Drum Kit</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">NEON <span>BEATS</span></h1>
 
-<head>
-  <meta charset="utf-8">
-  <title>Drum Kit</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet">
-</head>
+      <div class="keys">
+        <div data-key="w" class="key">
+          <kbd>W</kbd>
+          <span class="sound">Tom 1</span>
+        </div>
+        <div data-key="a" class="key">
+          <kbd>A</kbd>
+          <span class="sound">Tom 2</span>
+        </div>
+        <div data-key="s" class="key">
+          <kbd>S</kbd>
+          <span class="sound">Tom 3</span>
+        </div>
+        <div data-key="d" class="key">
+          <kbd>D</kbd>
+          <span class="sound">Tom 4</span>
+        </div>
+        <div data-key="j" class="key">
+          <kbd>J</kbd>
+          <span class="sound">Snare</span>
+        </div>
+        <div data-key="k" class="key">
+          <kbd>K</kbd>
+          <span class="sound">Crash</span>
+        </div>
+        <div data-key="l" class="key">
+          <kbd>L</kbd>
+          <span class="sound">Kick</span>
+        </div>
+      </div>
+    </div>
 
-<body>
-
-  <h1 id="title">Drum 🥁 Kit</h1>
-  <div class="set">
-    <button class="w drum">w</button>
-    <button class="a drum">a</button>
-    <button class="s drum">s</button>
-    <button class="d drum">d</button>
-    <button class="j drum">j</button>
-    <button class="k drum">k</button>
-    <button class="l drum">l</button>
-  </div>
-
-
-  <footer>
-    Made with ❤️.
-  </footer>
-  <script src="index.js"></script>
-
-</body>
-
+    <footer>Built for the future.</footer>
+    <script src="index.js"></script>
+  </body>
 </html>

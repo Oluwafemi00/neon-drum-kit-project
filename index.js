@@ -1,39 +1,62 @@
-var numberOfDrums = document.querySelectorAll("button").length;
+// Configuration Object: scalable and easy to edit
+const soundMap = {
+  w: "sounds/tom-1.mp3",
+  a: "sounds/tom-2.mp3",
+  s: "sounds/tom-3.mp3",
+  d: "sounds/tom-4.mp3",
+  j: "sounds/snare.mp3",
+  k: "sounds/crash.mp3",
+  l: "sounds/kick-bass.mp3",
+};
 
-for(var i = 0; i<numberOfDrums; i++){
-document.querySelectorAll("button")[i].addEventListener("click",function () {
-       var buttonInnerHTML = this.innerHTML
-       switch (buttonInnerHTML) {
-        case "w":
-            var tom1 = new Audio('sounds/tom-1.mp3')
-        tom1.play();
-            break;
-         case "a":
-            var tom2 = new Audio('sounds/tom-2.mp3')
-        tom2.play();
-            break;
-         case "s":
-            var tom3 = new Audio('sounds/tom-3.mp3')
-        tom3.play();
-            break;
-         case "d":
-            var tom4 = new Audio('sounds/tom-4.mp3')
-        tom4.play();
-            break;
-        case "j":
-            var snare = new Audio('sounds/snare.mp3')
-        snare.play();
-            break;
-        case "k":
-            var crash = new Audio('sounds/crash.mp3')
-        crash.play();
-            break;
-        case "l":
-            var kick = new Audio('sounds/kick-bass.mp3')
-        kick.play();
-            break;
-       
-        default:
-            console.log(buttonInnerHTML);
-            break;
-       }})}
+class DrumKit {
+  constructor() {
+    this.keys = document.querySelectorAll(".key");
+    this.init();
+  }
+
+  init() {
+    // 1. Listen for Keyboard events
+    window.addEventListener("keydown", (e) => this.playSound(e.key));
+
+    // 2. Listen for Click events (using modern forEach)
+    this.keys.forEach((key) => {
+      key.addEventListener("click", () => {
+        const keyChar = key.getAttribute("data-key");
+        this.playSound(keyChar);
+      });
+
+      // 3. Remove transition class automatically when animation ends
+      key.addEventListener("transitionend", this.removeTransition);
+    });
+  }
+
+  playSound(keyChar) {
+    // Normalize to lowercase to handle CapsLock
+    const key = keyChar.toLowerCase();
+
+    // Guard Clause: If the key isn't in our map, stop the function
+    if (!soundMap[key]) return;
+
+    // Visual Effect
+    const keyElement = document.querySelector(`.key[data-key="${key}"]`);
+    if (keyElement) {
+      keyElement.classList.add("playing");
+    }
+
+    // Audio Effect
+    // We create a new Audio instance every time to allow rapid-fire play
+    const audio = new Audio(soundMap[key]);
+    audio.currentTime = 0; // Rewind to start if already playing
+    audio.play();
+  }
+
+  removeTransition(e) {
+    // Only care about the transform property to avoid double-firing
+    if (e.propertyName !== "transform") return;
+    this.classList.remove("playing");
+  }
+}
+
+// Initialize the App
+const app = new DrumKit();
