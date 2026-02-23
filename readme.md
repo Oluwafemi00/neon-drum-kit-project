@@ -27,7 +27,7 @@ This project was heavily refactored to demonstrate modern JavaScript best practi
 1. Clone the repository:
 
    ```bash
-   git clone (https://github.com/oluwafemi00/neon-drum-kit-project.git)
+   git clone https://github.com/oluwafemi00/neon-drum-kit-project.git
 
    ```
 
