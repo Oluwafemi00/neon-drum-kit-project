@@ -1,20 +1,20 @@
-# 🥁 Neon Beats Drum Kit
+# Neon Beats Drum Kit
 
 A modern, interactive drum kit playable via keyboard or mouse. This project serves as a practical demonstration of refactoring legacy procedural JavaScript into clean, scalable, Object-Oriented code.
 
-## ✨ Features
+## Features
 
 - **Multi-Input Playback:** Trigger sounds via mouse clicks or corresponding keyboard presses.
 - **Zero-Latency Audio:** Rapid-fire audio instantiation allows for overlapping beats without clipping.
 - **Modern UI/UX:** Features a responsive "Neon Glassmorphism" aesthetic with synced CSS/JS animations.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **HTML5:** Semantic structure and `data-*` attributes for DOM-to-Logic binding.
 - **CSS3:** CSS Variables (Custom Properties), Flexbox, and complex CSS shadows for the glowing effects.
 - **JavaScript (ES6+):** Object-Oriented Programming (Classes), Arrow Functions, and Data Dictionaries.
 
-## 🧠 The Architecture (Refactoring Journey)
+## The Architecture (Refactoring Journey)
 
 This project was heavily refactored to demonstrate modern JavaScript best practices:
 
@@ -22,7 +22,7 @@ This project was heavily refactored to demonstrate modern JavaScript best practi
 2. **Object-Oriented Encapsulation:** Wrapped the application inside a `DrumKit` class. This prevents global scope pollution and cleanly organizes initialization, event listeners, and DOM manipulation.
 3. **Synchronized Animations:** Moved away from hardcoded `setTimeout` functions. The app now listens for the CSS `transitionend` event to remove CSS classes, ensuring the JavaScript logic and CSS rendering are perfectly in sync regardless of how CSS transition times are updated in the future.
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Clone the repository:
 
@@ -35,7 +35,7 @@ This project was heavily refactored to demonstrate modern JavaScript best practi
 
 3. Open index.html in your browser. No build steps or local server required!
 
-## 🤝 Let's Connect
+## Let's Connect
 
 I'm a Full Stack JavaScript developer focusing on the PERN stack and scalable web architecture.
 
