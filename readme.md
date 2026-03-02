@@ -1,6 +1,6 @@
 # Neon Beats Drum Kit
 
-A modern, interactive drum kit playable via keyboard or mouse. This project serves as a practical demonstration of refactoring legacy procedural JavaScript into clean, scalable, Object-Oriented code.
+A modern, interactive drum kit playable via keyboard or mouse. This project serves as a practical demonstration of a clean, scalable, Object-Oriented JavaScript code.
 
 ## Features
 
@@ -14,9 +14,9 @@ A modern, interactive drum kit playable via keyboard or mouse. This project serv
 - **CSS3:** CSS Variables (Custom Properties), Flexbox, and complex CSS shadows for the glowing effects.
 - **JavaScript (ES6+):** Object-Oriented Programming (Classes), Arrow Functions, and Data Dictionaries.
 
-## The Architecture (Refactoring Journey)
+## The Architecture
 
-This project was heavily refactored to demonstrate modern JavaScript best practices:
+This project demonstrates modern JavaScript best practices:
 
 1. **Data-Driven Design over Control Flow:** Replaced a monolithic 30-line `switch` statement with a single `soundMap` object. This separates the _data_ (which key plays which sound) from the _logic_ (how the sound is played), making the app infinitely scalable without writing more logic.
 2. **Object-Oriented Encapsulation:** Wrapped the application inside a `DrumKit` class. This prevents global scope pollution and cleanly organizes initialization, event listeners, and DOM manipulation.
