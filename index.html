@@ -3,50 +3,863 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Drum Kit</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Neon Beats — Drum Kit</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* ===== RESET ===== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ===== VARIABLES ===== */
+      :root {
+        --bg: #080b12;
+        --surface: #0d1020;
+        --surface2: #131828;
+        --surface3: #1a2035;
+        --border: rgba(255, 255, 255, 0.06);
+        --border2: rgba(255, 255, 255, 0.12);
+        --text: #e8edf8;
+        --text2: #6a78a0;
+        --text3: #3a4460;
+
+        /* Per-pad colors */
+        --cyan: #00e5cc;
+        --cyan-glow: rgba(0, 229, 204, 0.35);
+        --violet: #a855f7;
+        --violet-glow: rgba(168, 85, 247, 0.35);
+        --amber: #f59e0b;
+        --amber-glow: rgba(245, 158, 11, 0.35);
+        --rose: #f43f5e;
+        --rose-glow: rgba(244, 63, 94, 0.35);
+        --blue: #3b82f6;
+        --blue-glow: rgba(59, 130, 246, 0.35);
+        --green: #22c55e;
+        --green-glow: rgba(34, 197, 94, 0.35);
+        --orange: #fb923c;
+        --orange-glow: rgba(251, 146, 60, 0.35);
+      }
+
+      /* ===== BASE ===== */
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* ===== DEEP SPACE BG ===== */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            ellipse 60% 40% at 20% 20%,
+            rgba(0, 229, 204, 0.04) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 50% 40% at 80% 80%,
+            rgba(168, 85, 247, 0.05) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 80% 60% at 50% 50%,
+            rgba(59, 130, 246, 0.03) 0%,
+            transparent 70%
+          );
+      }
+
+      /* SCAN LINES */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.08) 2px,
+          rgba(0, 0, 0, 0.08) 4px
+        );
+      }
+
+      /* ===== SHELL ===== */
+      .shell {
+        position: relative;
+        z-index: 2;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px 40px;
+        gap: 40px;
+      }
+
+      /* ===== HEADER ===== */
+      .header {
+        text-align: center;
+      }
+
+      .header-eyebrow {
+        font-family: "Space Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--text3);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .eyebrow-line {
+        display: inline-block;
+        width: 40px;
+        height: 1px;
+        background: var(--text3);
+      }
+
+      .header-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(42px, 8vw, 88px);
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -2px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .header-title .accent {
+        color: transparent;
+        -webkit-text-stroke: 1.5px var(--cyan);
+        filter: drop-shadow(0 0 18px var(--cyan));
+      }
+
+      .header-sub {
+        font-size: 13px;
+        color: var(--text2);
+        letter-spacing: 0.06em;
+        margin-top: 10px;
+      }
+
+      /* ===== VU METER ===== */
+      .vu-bar {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 3px;
+        height: 32px;
+      }
+      .vu-seg {
+        width: 5px;
+        border-radius: 2px;
+        background: var(--surface3);
+        transition:
+          height 0.08s,
+          background 0.08s;
+      }
+
+      /* ===== MACHINE BODY ===== */
+      .machine {
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 24px;
+        padding: 32px 28px;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 40px 80px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        max-width: 680px;
+        width: 100%;
+        position: relative;
+      }
+
+      /* machine top accent strip */
+      .machine::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 32px;
+        right: 32px;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 229, 204, 0.4),
+          transparent
+        );
+        border-radius: 1px;
+      }
+
+      /* MACHINE LABEL */
+      .machine-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .machine-brand {
+        font-family: "Space Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+      .machine-model {
+        font-family: "Space Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        color: var(--cyan);
+        opacity: 0.7;
+      }
+      .power-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow:
+          0 0 6px var(--green),
+          0 0 12px rgba(34, 197, 94, 0.4);
+        animation: powerPulse 3s ease-in-out infinite;
+      }
+      @keyframes powerPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* ===== PAD GRID ===== */
+      .pad-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      @media (max-width: 480px) {
+        .pad-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+      }
+
+      /* ===== PAD ===== */
+      .pad {
+        --pad-color: var(--cyan);
+        --pad-glow: var(--cyan-glow);
+
+        aspect-ratio: 1;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: var(--surface2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.07s cubic-bezier(0.34, 1.56, 0.64, 1),
+          border-color 0.12s,
+          box-shadow 0.12s;
+
+        /* Subtle top-left highlight like a physical button */
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.06),
+          inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+          0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Color variants */
+      .pad[data-key="w"] {
+        --pad-color: var(--cyan);
+        --pad-glow: var(--cyan-glow);
+      }
+      .pad[data-key="a"] {
+        --pad-color: var(--violet);
+        --pad-glow: var(--violet-glow);
+      }
+      .pad[data-key="s"] {
+        --pad-color: var(--amber);
+        --pad-glow: var(--amber-glow);
+      }
+      .pad[data-key="d"] {
+        --pad-color: var(--rose);
+        --pad-glow: var(--rose-glow);
+      }
+      .pad[data-key="j"] {
+        --pad-color: var(--blue);
+        --pad-glow: var(--blue-glow);
+      }
+      .pad[data-key="k"] {
+        --pad-color: var(--green);
+        --pad-glow: var(--green-glow);
+      }
+      .pad[data-key="l"] {
+        --pad-color: var(--orange);
+        --pad-glow: var(--orange-glow);
+      }
+
+      /* Colour tint behind label */
+      .pad::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+        pointer-events: none;
+      }
+
+      /* Color accent on left edge */
+      .pad::after {
+        content: "";
+        position: absolute;
+        top: 12px;
+        bottom: 12px;
+        left: 0;
+        width: 2px;
+        border-radius: 0 2px 2px 0;
+        background: var(--pad-color);
+        opacity: 0.4;
+        transition:
+          opacity 0.12s,
+          height 0.12s;
+      }
+
+      .pad:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.08),
+          inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+          0 4px 20px rgba(0, 0, 0, 0.4);
+        transform: translateY(-1px);
+      }
+
+      /* PLAYING STATE */
+      .pad.playing {
+        transform: scale(0.93) translateY(2px);
+        border-color: var(--pad-color);
+        background: var(--surface3);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.02),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+          0 0 24px var(--pad-glow),
+          0 0 60px var(--pad-glow);
+      }
+      .pad.playing::after {
+        opacity: 1;
+        top: 8px;
+        bottom: 8px;
+      }
+      .pad.playing .pad-key {
+        color: var(--pad-color);
+        text-shadow: 0 0 12px var(--pad-color);
+      }
+      .pad.playing .pad-label {
+        color: var(--text);
+      }
+
+      /* RIPPLE */
+      .pad-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--pad-color);
+        transform: scale(0);
+        opacity: 0.25;
+        animation: ripple 0.4s ease-out forwards;
+        pointer-events: none;
+      }
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* PAD KEY */
+      .pad-key {
+        font-family: "Space Mono", monospace;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text2);
+        line-height: 1;
+        transition:
+          color 0.12s,
+          text-shadow 0.12s;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* PAD LABEL */
+      .pad-label {
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text3);
+        transition: color 0.12s;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ===== BOTTOM BAR ===== */
+      .bottom-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .kb-hints {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .kb-hint {
+        font-size: 10px;
+        color: var(--text3);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .kb-hint kbd {
+        font-family: "Space Mono", monospace;
+        font-size: 9px;
+        border: 1px solid var(--border2);
+        background: var(--surface3);
+        border-radius: 4px;
+        padding: 2px 6px;
+        color: var(--text2);
+      }
+
+      /* LAST PLAYED */
+      .last-played {
+        font-family: "Space Mono", monospace;
+        font-size: 10px;
+        color: var(--text3);
+        letter-spacing: 0.1em;
+        min-height: 16px;
+        transition: color 0.2s;
+      }
+      .last-played.active {
+        color: var(--cyan);
+      }
+
+      /* ===== VOLUME KNOB AREA ===== */
+      .controls-row {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 24px;
+        padding: 16px 20px;
+        background: var(--surface2);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+      .ctrl-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+      }
+      .ctrl-label {
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text3);
+      }
+      .ctrl-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 3px;
+        background: var(--surface3);
+        border-radius: 2px;
+        outline: none;
+        cursor: pointer;
+        width: 100%;
+      }
+      .ctrl-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 6px var(--cyan-glow);
+        cursor: pointer;
+      }
+      .ctrl-value {
+        font-family: "Space Mono", monospace;
+        font-size: 10px;
+        color: var(--cyan);
+        text-align: right;
+      }
+
+      /* ===== FOOTER ===== */
+      .footer {
+        font-size: 11px;
+        color: var(--text3);
+        letter-spacing: 0.1em;
+        text-align: center;
+      }
+
+      /* ===== VU METER ANIMATION ===== */
+      @keyframes vuPop {
+        0% {
+          height: var(--peak);
+          background: var(--pad-color, var(--cyan));
+        }
+        100% {
+          height: 4px;
+          background: var(--surface3);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <h1 class="title">NEON <span>BEATS</span></h1>
+    <div class="shell">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="header-eyebrow">
+          <span class="eyebrow-line"></span>
+          Electronic Percussion
+          <span class="eyebrow-line"></span>
+        </div>
+        <h1 class="header-title">
+          NEON<br /><span class="accent">BEATS</span>
+        </h1>
+        <p class="header-sub">
+          Press keys W · A · S · D · J · K · L — or tap the pads
+        </p>
+      </div>
 
-      <div class="keys">
-        <div data-key="w" class="key">
-          <kbd>W</kbd>
-          <span class="sound">Tom 1</span>
+      <!-- VU METER -->
+      <div class="vu-bar" id="vuBar">
+        <!-- segments injected by JS -->
+      </div>
+
+      <!-- MACHINE -->
+      <div class="machine">
+        <div class="machine-label">
+          <span class="machine-brand">Asaph Instruments</span>
+          <span class="power-dot"></span>
+          <span class="machine-model">NB-808</span>
         </div>
-        <div data-key="a" class="key">
-          <kbd>A</kbd>
-          <span class="sound">Tom 2</span>
+
+        <!-- CONTROLS ROW -->
+        <div class="controls-row">
+          <div class="ctrl-group">
+            <span class="ctrl-label">Volume</span>
+            <input
+              type="range"
+              class="ctrl-slider"
+              id="volumeSlider"
+              min="0"
+              max="100"
+              value="80"
+            />
+          </div>
+          <span class="ctrl-value" id="volVal">80%</span>
         </div>
-        <div data-key="s" class="key">
-          <kbd>S</kbd>
-          <span class="sound">Tom 3</span>
+
+        <!-- PAD GRID -->
+        <div class="pad-grid" id="padGrid">
+          <div class="pad" data-key="w">
+            <span class="pad-key">W</span>
+            <span class="pad-label">Tom 1</span>
+          </div>
+          <div class="pad" data-key="a">
+            <span class="pad-key">A</span>
+            <span class="pad-label">Tom 2</span>
+          </div>
+          <div class="pad" data-key="s">
+            <span class="pad-key">S</span>
+            <span class="pad-label">Tom 3</span>
+          </div>
+          <div class="pad" data-key="d">
+            <span class="pad-key">D</span>
+            <span class="pad-label">Tom 4</span>
+          </div>
+          <div class="pad" data-key="j">
+            <span class="pad-key">J</span>
+            <span class="pad-label">Snare</span>
+          </div>
+          <div class="pad" data-key="k">
+            <span class="pad-key">K</span>
+            <span class="pad-label">Crash</span>
+          </div>
+          <div class="pad" data-key="l">
+            <span class="pad-key">L</span>
+            <span class="pad-label">Kick</span>
+          </div>
         </div>
-        <div data-key="d" class="key">
-          <kbd>D</kbd>
-          <span class="sound">Tom 4</span>
-        </div>
-        <div data-key="j" class="key">
-          <kbd>J</kbd>
-          <span class="sound">Snare</span>
-        </div>
-        <div data-key="k" class="key">
-          <kbd>K</kbd>
-          <span class="sound">Crash</span>
-        </div>
-        <div data-key="l" class="key">
-          <kbd>L</kbd>
-          <span class="sound">Kick</span>
+
+        <!-- BOTTOM BAR -->
+        <div class="bottom-bar">
+          <div class="kb-hints">
+            <div class="kb-hint"><kbd>W A S D</kbd> Toms</div>
+            <div class="kb-hint"><kbd>J</kbd> Snare</div>
+            <div class="kb-hint"><kbd>K</kbd> Crash</div>
+            <div class="kb-hint"><kbd>L</kbd> Kick</div>
+          </div>
+          <div class="last-played" id="lastPlayed">— READY —</div>
         </div>
       </div>
+
+      <div class="footer">Built for the future · NB-808 v2.0</div>
     </div>
 
-    <footer>Built for the future.</footer>
-    <script src="index.js"></script>
+    <script>
+      // ─── SOUND MAP ───────────────────────────────────────────────
+      // Using Web Audio API to synthesize drum sounds — no files needed!
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+
+      let masterVolume = 0.8;
+
+      const volumeSlider = document.getElementById("volumeSlider");
+      const volVal = document.getElementById("volVal");
+      volumeSlider.addEventListener("input", () => {
+        masterVolume = volumeSlider.value / 100;
+        volVal.textContent = `${volumeSlider.value}%`;
+      });
+
+      // ─── DRUM SYNTHESIZER ────────────────────────────────────────
+      function playKick() {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(0.001, now + 0.5);
+        gain.gain.setValueAtTime(masterVolume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+
+      function playSnare() {
+        const now = ctx.currentTime;
+        const bufSize = ctx.sampleRate * 0.2;
+        const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+        const source = ctx.createBufferSource();
+        source.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = "highpass";
+        filter.frequency.value = 1000;
+        const gain = ctx.createGain();
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(masterVolume * 0.6, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        source.start(now);
+        source.stop(now + 0.2);
+      }
+
+      function playCrash() {
+        const now = ctx.currentTime;
+        const bufSize = ctx.sampleRate * 1.5;
+        const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+        const source = ctx.createBufferSource();
+        source.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 6000;
+        filter.Q.value = 0.5;
+        const gain = ctx.createGain();
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(masterVolume * 0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+        source.start(now);
+        source.stop(now + 1.5);
+      }
+
+      function playTom(freq = 200, decay = 0.3) {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.4, now + decay);
+        gain.gain.setValueAtTime(masterVolume * 0.9, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + decay);
+        osc.start(now);
+        osc.stop(now + decay);
+      }
+
+      // ─── SOUND MAP ───────────────────────────────────────────────
+      const soundMap = {
+        w: { play: () => playTom(280, 0.35), label: "Tom 1" },
+        a: { play: () => playTom(220, 0.4), label: "Tom 2" },
+        s: { play: () => playTom(180, 0.45), label: "Tom 3" },
+        d: { play: () => playTom(140, 0.5), label: "Tom 4" },
+        j: { play: () => playSnare(), label: "Snare" },
+        k: { play: () => playCrash(), label: "Crash" },
+        l: { play: () => playKick(), label: "Kick" },
+      };
+
+      // ─── VU METER ────────────────────────────────────────────────
+      const vuBar = document.getElementById("vuBar");
+      const VU_COUNT = 20;
+      const vuSegs = [];
+      for (let i = 0; i < VU_COUNT; i++) {
+        const seg = document.createElement("div");
+        seg.className = "vu-seg";
+        seg.style.height = "4px";
+        vuBar.appendChild(seg);
+        vuSegs.push(seg);
+      }
+
+      function triggerVU(color) {
+        const peak = 10 + Math.floor(Math.random() * 22);
+        const count = Math.floor((peak / 32) * VU_COUNT);
+        vuSegs.forEach((seg, i) => {
+          if (i < count) {
+            const h = 4 + Math.random() * peak;
+            seg.style.height = `${h}px`;
+            seg.style.background = color;
+            seg.style.boxShadow = `0 0 6px ${color}`;
+          } else {
+            seg.style.height = "4px";
+            seg.style.background = "var(--surface3)";
+            seg.style.boxShadow = "none";
+          }
+        });
+        setTimeout(() => {
+          vuSegs.forEach((seg) => {
+            seg.style.height = "4px";
+            seg.style.background = "var(--surface3)";
+            seg.style.boxShadow = "none";
+          });
+        }, 140);
+      }
+
+      // ─── PAD COLORS (for VU) ─────────────────────────────────────
+      const padColors = {
+        w: "#00E5CC",
+        a: "#A855F7",
+        s: "#F59E0B",
+        d: "#F43F5E",
+        j: "#3B82F6",
+        k: "#22C55E",
+        l: "#FB923C",
+      };
+
+      // ─── LAST PLAYED ─────────────────────────────────────────────
+      const lastPlayedEl = document.getElementById("lastPlayed");
+      let lastPlayedTimer;
+      function setLastPlayed(label, color) {
+        lastPlayedEl.textContent = `▶  ${label.toUpperCase()}`;
+        lastPlayedEl.classList.add("active");
+        lastPlayedEl.style.color = color;
+        clearTimeout(lastPlayedTimer);
+        lastPlayedTimer = setTimeout(() => {
+          lastPlayedEl.textContent = "— READY —";
+          lastPlayedEl.classList.remove("active");
+          lastPlayedEl.style.color = "";
+        }, 1200);
+      }
+
+      // ─── RIPPLE ──────────────────────────────────────────────────
+      function spawnRipple(pad) {
+        const r = document.createElement("div");
+        r.className = "pad-ripple";
+        const size = pad.offsetWidth * 0.3;
+        r.style.cssText = `
+    width:${size}px;height:${size}px;
+    top:50%;left:50%;
+    margin-top:-${size / 2}px;margin-left:-${size / 2}px;
+    background:${getComputedStyle(document.documentElement).getPropertyValue("--pad-color") || "#00E5CC"};
+  `;
+        pad.appendChild(r);
+        r.addEventListener("animationend", () => r.remove());
+      }
+
+      // ─── PLAY SOUND ──────────────────────────────────────────────
+      function playSound(key) {
+        const k = key.toLowerCase();
+        const sound = soundMap[k];
+        if (!sound) return;
+
+        // Resume audio context on first interaction
+        if (ctx.state === "suspended") ctx.resume();
+
+        sound.play();
+
+        const pad = document.querySelector(`.pad[data-key="${k}"]`);
+        if (pad) {
+          pad.classList.remove("playing");
+          void pad.offsetWidth; // force reflow
+          pad.classList.add("playing");
+          spawnRipple(pad);
+          setTimeout(() => pad.classList.remove("playing"), 150);
+        }
+
+        const color = padColors[k] || "#00E5CC";
+        triggerVU(color);
+        setLastPlayed(sound.label, color);
+      }
+
+      // ─── EVENT LISTENERS ─────────────────────────────────────────
+      window.addEventListener("keydown", (e) => {
+        if (e.repeat) return; // prevent held-key spam
+        playSound(e.key);
+      });
+
+      document.querySelectorAll(".pad").forEach((pad) => {
+        pad.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          playSound(pad.dataset.key);
+        });
+      });
+
+      // ─── MOBILE TOUCH PREVENTION ─────────────────────────────────
+      document.addEventListener(
+        "touchstart",
+        () => {
+          if (ctx.state === "suspended") ctx.resume();
+        },
+        { once: true },
+      );
+    </script>
   </body>
 </html>
